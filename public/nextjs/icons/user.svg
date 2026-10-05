@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
+  <g stroke="#BCCAD7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="20" cy="12" r="7"/>
+    <path d="M7 35v-3a13 13 0 0 1 26 0v3H7Z"/>
+  </g>
+</svg>

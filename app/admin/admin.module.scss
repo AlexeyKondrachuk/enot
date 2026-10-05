@@ -1,0 +1,671 @@
+@use "../styles/variables" as *;
+
+.loginPage,
+.adminShell,
+.adminError {
+  min-height: 100dvh;
+  color: #f5f7f8;
+  background: #07131c;
+}
+
+.loginPage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  overflow: hidden;
+}
+.loginGlow {
+  position: absolute;
+  width: 620px;
+  height: 620px;
+  border-radius: 50%;
+  background: rgba(215, 255, 56, 0.12);
+  filter: blur(130px);
+}
+.loginCard {
+  position: relative;
+  width: min(100%, 410px);
+  padding: 38px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 32px;
+  background: linear-gradient(
+    145deg,
+    rgba(28, 46, 59, 0.9),
+    rgba(8, 20, 29, 0.94)
+  );
+  box-shadow:
+    0 38px 100px rgba(0, 0, 0, 0.48),
+    inset 0 1px rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(30px);
+  h1 {
+    margin: 5px 0 6px;
+    font-size: 32px;
+    letter-spacing: -0.04em;
+  }
+  > div > p:last-child {
+    margin: 0;
+    color: #82929e;
+    font-size: 13px;
+  }
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    color: #aeb9c0;
+    font-size: 12px;
+  }
+  input {
+    height: 54px;
+    padding: 0 17px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 16px;
+    outline: 0;
+    color: white;
+    background: rgba(255, 255, 255, 0.06);
+    font-size: 16px;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+    &:focus {
+      border-color: rgba(215, 255, 56, 0.65);
+      box-shadow: 0 0 0 4px rgba(215, 255, 56, 0.08);
+    }
+  }
+  > button {
+    height: 52px;
+    border: 0;
+    border-radius: 16px;
+    color: #071119;
+    background: $lime;
+    font-weight: 750;
+    cursor: pointer;
+    &:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+  }
+  > small {
+    color: #637580;
+    font-size: 10px;
+    text-align: center;
+  }
+}
+.loginMark {
+  width: 53px;
+  height: 53px;
+  display: grid;
+  place-items: center;
+  border-radius: 17px;
+  color: #071119;
+  background: linear-gradient(145deg, #f1ffa5, $lime);
+  box-shadow: 0 10px 30px rgba(215, 255, 56, 0.18);
+  font-size: 22px;
+  font-weight: 900;
+}
+.loginKicker {
+  margin: 0;
+  color: $lime !important;
+  font-size: 9px !important;
+  letter-spacing: 0.22em;
+}
+.loginError {
+  margin: -12px 0 0;
+  color: #ff837e;
+  font-size: 11px;
+}
+
+.adminShell {
+  height: 100dvh;
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  overflow: hidden;
+}
+.adminSidebar {
+  min-height: 0;
+  padding: 18px 12px 14px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  border-right: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(11, 26, 36, 0.96);
+}
+.adminBrand {
+  height: 64px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  > div {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 13px;
+    color: #071119;
+    background: $lime;
+    font-weight: 900;
+  }
+  p {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  b {
+    font-size: 15px;
+  }
+  span {
+    color: #71838f;
+    font-size: 10px;
+  }
+}
+.inboxTitle {
+  padding: 26px 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  h1 {
+    margin: 0;
+    font-size: 21px;
+    letter-spacing: -0.03em;
+  }
+  span {
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    color: #0b171e;
+    background: $lime;
+    font-size: 10px;
+    font-weight: 800;
+  }
+}
+.conversationList {
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+  > button {
+    width: 100%;
+    padding: 12px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 11px;
+    border: 0;
+    border-radius: 17px;
+    color: inherit;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s;
+    &:hover {
+      background: rgba(255, 255, 255, 0.045);
+    }
+  }
+  > button.conversationActive {
+    background: rgba(255, 255, 255, 0.085);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  }
+}
+.visitorAvatar {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 13px;
+  color: #dffb62;
+  background: linear-gradient(145deg, #243b48, #132531);
+  font-size: 10px;
+  font-weight: 800;
+}
+.conversationCopy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  b {
+    overflow: hidden;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  small {
+    overflow: hidden;
+    color: #748691;
+    font-size: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+.conversationMeta {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-around;
+  time {
+    color: #60727e;
+    font-size: 8px;
+  }
+  i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+}
+.statusOpen {
+  background: #56d578;
+  box-shadow: 0 0 0 3px rgba(86, 213, 120, 0.09);
+}
+.statusClosed {
+  background: #50616c;
+}
+.emptyList {
+  padding: 80px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #71828e;
+  text-align: center;
+  b {
+    color: #b8c2c8;
+    font-size: 13px;
+  }
+  span {
+    font-size: 10px;
+  }
+}
+.sidebarActions {
+  padding: 8px 7px 0;
+  display: grid;
+  gap: 7px;
+}
+.pushControl {
+  display: grid;
+  gap: 5px;
+  > small {
+    padding-inline: 5px;
+    color: #71838f;
+    font-size: 8px;
+    line-height: 1.35;
+  }
+}
+.logoutButton,
+.pushButton {
+  min-height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 14px;
+  color: #81919c;
+  background: rgba(255, 255, 255, 0.025);
+  cursor: pointer;
+  &:hover:not(:disabled) {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  &:disabled {
+    cursor: default;
+    opacity: 0.55;
+  }
+}
+.pushButton {
+  padding: 9px 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #91a1aa;
+  font-size: 10px;
+  text-align: left;
+  span {
+    color: #657782;
+    font-size: 12px;
+  }
+}
+.pushButtonActive {
+  border-color: rgba(215, 255, 56, 0.22);
+  color: #dffb62;
+  background: rgba(215, 255, 56, 0.055);
+  span {
+    color: $lime;
+  }
+}
+
+.adminDialog {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background:
+    radial-gradient(circle at 85% 0, rgba(61, 91, 106, 0.16), transparent 35%),
+    #07131c;
+}
+.dialogHeader {
+  min-height: 83px;
+  padding: 14px 25px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 13px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.018);
+  backdrop-filter: blur(20px);
+  > div:nth-child(2) {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    b {
+      font-size: 14px;
+    }
+    span {
+      color: #71838f;
+      font-size: 10px;
+    }
+  }
+  > button {
+    padding: 9px 13px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    color: #9faeb7;
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 10px;
+    cursor: pointer;
+    &:hover {
+      border-color: rgba(215, 255, 56, 0.4);
+      color: $lime;
+    }
+  }
+}
+.adminMessages {
+  min-height: 0;
+  padding: 28px clamp(20px, 5vw, 80px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+.adminDate {
+  margin: 0 0 25px;
+  color: #60727e;
+  font-size: 9px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+}
+.adminMessageRow {
+  display: flex;
+  margin-bottom: 10px;
+  > div {
+    max-width: min(68%, 560px);
+    padding: 11px 14px 7px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 18px 18px 18px 6px;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  }
+  p {
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  time {
+    display: block;
+    margin-top: 4px;
+    color: #71828d;
+    font-size: 8px;
+    text-align: right;
+  }
+}
+.adminMessageOwn {
+  justify-content: flex-end;
+  > div {
+    border-color: rgba(215, 255, 56, 0.35);
+    border-radius: 18px 18px 6px 18px;
+    color: #08141a;
+    background: linear-gradient(145deg, #ebff8c, $lime);
+  }
+  time {
+    color: rgba(8, 20, 26, 0.55);
+  }
+}
+.adminMessageMeta {
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  time {
+    margin: 0;
+  }
+  button {
+    padding: 0;
+    border: 0;
+    color: #7e909b;
+    background: transparent;
+    font-size: 8px;
+    cursor: pointer;
+    opacity: 0;
+    transition:
+      color 0.2s,
+      opacity 0.2s;
+    &:hover {
+      color: #ff8b84;
+    }
+    &:disabled {
+      cursor: default;
+      opacity: 0.45;
+    }
+  }
+}
+.adminMessageRow:hover .adminMessageMeta button,
+.adminMessageMeta button:focus-visible {
+  opacity: 1;
+}
+.adminMessageOwn .adminMessageMeta button {
+  color: rgba(8, 20, 26, 0.48);
+  &:hover {
+    color: #8b2b29;
+  }
+}
+.adminComposer {
+  margin: 0 auto 24px;
+  width: min(calc(100% - 48px), 820px);
+  min-height: 58px;
+  padding: 7px 8px 7px 18px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow:
+    0 16px 45px rgba(0, 0, 0, 0.25),
+    inset 0 1px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(22px);
+  &:focus-within {
+    border-color: rgba(215, 255, 56, 0.5);
+    box-shadow: 0 0 0 4px rgba(215, 255, 56, 0.06);
+  }
+  textarea {
+    width: 100%;
+    max-height: 100px;
+    padding: 10px 0;
+    resize: none;
+    border: 0;
+    outline: 0;
+    color: white;
+    background: transparent;
+    font: inherit;
+    font-size: 13px;
+    &:disabled {
+      opacity: 0.35;
+    }
+  }
+  button {
+    width: 43px;
+    height: 43px;
+    border: 0;
+    border-radius: 14px;
+    color: #071119;
+    background: $lime;
+    font-size: 21px;
+    cursor: pointer;
+    &:disabled {
+      opacity: 0.25;
+      cursor: default;
+    }
+  }
+}
+.adminActionError {
+  margin: -2px 0 2px;
+  grid-column: 1/-1;
+  color: #ff8b84;
+  font-size: 10px;
+}
+.noDialog {
+  place-self: center;
+  text-align: center;
+  color: #71828d;
+  > div {
+    margin: auto;
+    width: 60px;
+    height: 60px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    color: $lime;
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 24px;
+  }
+  h2 {
+    margin: 18px 0 5px;
+    color: #dce3e6;
+    font-size: 19px;
+  }
+  p {
+    margin: 0;
+    font-size: 11px;
+  }
+}
+.adminError {
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+  h1 {
+    margin: 0 0 8px;
+  }
+  p {
+    color: #82939e;
+  }
+  button {
+    margin-top: 10px;
+    padding: 12px 18px;
+    border: 0;
+    border-radius: 13px;
+    color: #071119;
+    background: $lime;
+    font-weight: 700;
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 760px) {
+  .loginCard {
+    padding: 28px 22px;
+    border-radius: 26px;
+  }
+  .adminShell {
+    grid-template-columns: 94px 1fr;
+  }
+  .adminSidebar {
+    padding-inline: 8px;
+  }
+  .adminBrand {
+    justify-content: center;
+    p {
+      display: none;
+    }
+  }
+  .inboxTitle {
+    justify-content: center;
+    h1 {
+      display: none;
+    }
+  }
+  .conversationList > button {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    padding: 9px;
+  }
+  .conversationCopy,
+  .conversationMeta {
+    display: none;
+  }
+  .sidebarActions {
+    padding-inline: 0;
+  }
+  .pushButton {
+    justify-content: center;
+    font-size: 0;
+    span {
+      font-size: 14px;
+    }
+  }
+  .pushControl > small {
+    display: none;
+  }
+  .logoutButton {
+    font-size: 0;
+    span {
+      font-size: 16px;
+    }
+  }
+  .dialogHeader {
+    padding-inline: 14px;
+    > button {
+      padding: 8px;
+      max-width: 75px;
+    }
+  }
+  .adminMessages {
+    padding-inline: 14px;
+  }
+  .adminMessageRow > div {
+    max-width: 86%;
+  }
+  .adminMessageMeta button {
+    opacity: 1;
+  }
+  .adminComposer {
+    width: calc(100% - 24px);
+    margin-bottom: 12px;
+  }
+}
+
+.soundToggleButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 4px 8px;
+  opacity: 0.85;
+  &:hover { opacity: 1; }
+}
+
+.unreadDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e5484d;
+  flex-shrink: 0;
+}

@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+﻿# Енот
 
-## Getting Started
+Сайт разработчика: услуги, портфолио, информация о Next.js и документы для работы с клиентами. Публичный адрес — https://enotgo.ru.
 
-First, run the development server:
+## Стек
+
+Next.js 16, React 19, TypeScript, SCSS, Redux Toolkit, Prisma 7, PostgreSQL, Socket.IO и Web Push. Чат работает через отдельный сервер; административная панель доступна по `/admin/login`.
+
+## Локальный запуск
+
+Требуются Node.js 24 LTS, npm и Docker с Docker Compose либо установленный PostgreSQL.
+
+1. Установите зависимости: `npm ci`.
+2. Скопируйте `.env.example` в `.env.local` и задайте собственные пароли и секрет сессии. Для Prisma CLI задайте `DATABASE_URL` в окружении или локальном `.env`: Prisma конфигурация использует `dotenv/config`.
+3. Запустите базу: `docker compose up -d postgres`.
+4. Примените миграции: `npx prisma migrate deploy`.
+5. Для push-уведомлений выполните `npm run push:setup` и установите свой `VAPID_SUBJECT`.
+6. В отдельных терминалах запустите `npm run dev` и `npm run chat:dev`.
+
+Сайт: http://localhost:3000. Сервер чата: http://localhost:3001.
+
+Для запуска сервера чата в Docker: `docker compose up -d --build chat-server`.
+
+## Настройки
+
+- Контакты и описание сайта: `config.ts`.
+- Основной SEO-домен: `NEXT_PUBLIC_SITE_URL` (по умолчанию https://enotgo.ru).
+- Публичный URL сервера чата: `NEXT_PUBLIC_CHAT_SOCKET_URL`.
+- Разрешённый origin сайта для сервера чата: `CHAT_ALLOWED_ORIGIN`.
+- Origin для серверных запросов: `APP_ORIGIN`.
+- Дополнительные домены dev-сервера: `ALLOWED_DEV_ORIGINS`.
+
+Файлы `.env` и `.env.local` не публикуются. Значения в `.env.example` предназначены для примера; в production используйте собственные секреты.
+
+## Проверки и production
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run lint
+npx tsc --noEmit
+npm run build
+npm run start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+В production отдельно запустите `npm run chat:start`, примените миграции базы и настройте HTTPS и проксирование Socket.IO. Публичные переменные `NEXT_PUBLIC_*` задавайте перед сборкой.

@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: enot-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: enot
+      POSTGRES_USER: enot
+      POSTGRES_PASSWORD: enot_dev_password
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - enot-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U enot -d enot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  chat-server:
+    build:
+      context: .
+      dockerfile: services/chat-server/Dockerfile
+    container_name: enot-chat-server
+    restart: unless-stopped
+    env_file:
+      - .env.local
+    environment:
+      DATABASE_URL: postgresql://enot:enot_dev_password@postgres:5432/enot?schema=public
+      CHAT_ALLOWED_ORIGIN: ${CHAT_ALLOWED_ORIGIN:-http://localhost:3000}
+      CHAT_SOCKET_PORT: 3001
+    ports:
+      - "127.0.0.1:3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  enot-postgres-data:

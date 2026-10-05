@@ -1,0 +1,65 @@
+@use "../styles/variables" as *;
+
+.main { background: radial-gradient(ellipse at 8% 35%, rgba(21, 50, 67, .18), transparent 45%); }
+.hero { position: relative; min-height: 720px; padding: 190px 0 80px; isolation: isolate; overflow: hidden; }
+.heroInner { position: relative; z-index: 1; }
+.heroCopy { max-width: 740px; }
+.hero h1 { margin: 0; font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif; font-weight: 400; font-size: clamp(58px, 5.7vw, 90px); line-height: .98; letter-spacing: -.025em; }
+.hero h1 span { color: $lime; }
+.portrait { position: absolute; z-index: -1; right: -8%; bottom: 0; width: 78%; mask-image: linear-gradient(to bottom, #000 78%, transparent 100%); }
+.portrait img { display: block; width: 100%; height: auto; }
+.hero::after { content: ""; position: absolute; z-index: 0; inset: 0; background: linear-gradient(90deg, $bg 5%, rgba(6,18,27,.9) 25%, rgba(6,18,27,.3) 49%, transparent 65%); pointer-events: none; }
+.benefits { display: grid; grid-template-columns: repeat(3, 1fr); padding: 25px 0; border-block: 1px solid $line; }
+.benefits > div { display: flex; align-items: center; gap: 23px; padding: 0 28px; border-right: 1px solid $line; }
+.benefits > div:first-child { padding-left: 0; }
+.benefits > div:last-child { border: 0; padding-right: 0; }
+.benefits svg, .principles svg, .outcomes svg { flex-shrink: 0; color: $lime; }
+.benefits p, .outcomes p { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.benefits strong { font-size: 15px; font-weight: 550; }
+.benefits span, .outcomes span { color: $muted; font-size: 13px; line-height: 1.5; }
+.principles { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 44px; }
+.principles article { padding: 20px 26px 0; border-top: 1px solid $line; border-right: 1px solid $line; }
+.principles article:first-child { padding-left: 0; }
+.principles article:last-child { border-right: 0; padding-right: 0; }
+.principles h3 { margin: 20px 0 12px; font-size: 18px; line-height: 1.4; font-weight: 550; }
+.principles p { margin: 0; color: $muted; font-size: 15px; line-height: 1.6; }
+.stack { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; list-style: none; padding: 0; margin: 36px 0 0; }
+.stack li { min-width: 0; display: flex; align-items: center; justify-content: center; gap: 18px; padding: 20px 12px; border: 1px solid #293f4d; border-radius: 7px; background: rgba(3,14,21,.45); }
+.stack span { font-size: 15px; }
+.outcomes { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 40px; }
+.outcomes > div { display: flex; gap: 20px; padding: 0 22px; border-right: 1px solid $line; }
+.outcomes > div:first-child { padding-left: 0; }
+.outcomes > div:last-child { border: 0; padding-right: 0; }
+.outcomes strong { font-size: 22px; font-weight: 550; }
+.main a:focus-visible { outline: 2px solid $lime; outline-offset: 5px; }
+@media (max-width: 1100px) {
+  .hero { min-height: 660px; }
+  .heroCopy { max-width: 590px; }
+  .benefits > div { gap: 15px; padding-inline: 18px; }
+  .stack { gap: 10px; }
+  .stack li { gap: 10px; }
+  .principles article { padding-inline: 18px; }
+  .outcomes { grid-template-columns: repeat(2, 1fr); gap: 30px; }
+  .outcomes > div { padding: 0; border: 0; }
+}
+@media (max-width: 760px) {
+  .hero { padding: 110px 0 48px; min-height: auto; display: flex; flex-direction: column; }
+  .portrait { position: relative; order: 2; z-index: 1; width: 115%; right: auto; margin: 16px 0 -48px -10%; }
+  .hero::after { display: none; }
+  .heroCopy { max-width: none; }
+  .hero h1 { font-size: clamp(43px, 9.4vw, 68px); }
+  .desktopBreak { display: none; }
+  .benefits { grid-template-columns: 1fr; gap: 22px; }
+  .benefits > div { padding: 0; border: 0; }
+  .principles { grid-template-columns: repeat(2, 1fr); gap: 30px 22px; }
+  .principles article, .principles article:first-child, .principles article:last-child { padding: 20px 0 0; border-right: 0; }
+  .stack { grid-template-columns: repeat(2, 1fr); }
+  .stack li { justify-content: flex-start; padding: 16px; }
+  .outcomes strong { font-size: 19px; }
+  .outcomes > div { gap: 12px; }
+}
+@media (max-width: 410px) {
+  .principles, .outcomes { grid-template-columns: 1fr; }
+  .stack li { gap: 8px; padding: 12px 8px; }
+  .stack span { font-size: 13px; }
+}

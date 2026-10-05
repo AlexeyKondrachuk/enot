@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="132" viewBox="0 0 240 132" fill="none">
+  <defs>
+    <linearGradient id="surface" x1="20" y1="5" x2="209" y2="129" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9AC4DE" stop-opacity=".12"/>
+      <stop offset=".37" stop-color="#061219" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#7293A9" stop-opacity=".15"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="8" y1="8" x2="230" y2="124" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E6F5FF" stop-opacity=".9"/>
+      <stop offset=".25" stop-color="#9DBCCF" stop-opacity=".25"/>
+      <stop offset=".62" stop-color="#B7D7E9" stop-opacity=".4"/>
+      <stop offset="1" stop-color="#E6F5FF" stop-opacity=".8"/>
+    </linearGradient>
+    <linearGradient id="reflection" x1="37" y1="7" x2="104" y2="91" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E1F4FF" stop-opacity=".12"/>
+      <stop offset="1" stop-color="#E1F4FF" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="glow" x="-15%" y="-25%" width="130%" height="150%">
+      <feGaussianBlur stdDeviation="2"/>
+    </filter>
+  </defs>
+  <rect x="7" y="7" width="226" height="118" rx="12" stroke="#BDDCEF" stroke-opacity=".25" stroke-width="2" filter="url(#glow)"/>
+  <rect x="7" y="7" width="226" height="118" rx="12" fill="url(#surface)" stroke="url(#rim)" stroke-width="1.4"/>
+  <rect x="12" y="12" width="216" height="108" rx="8" stroke="#A8C6D8" stroke-opacity=".25"/>
+  <path d="M20 8h83L12 91V20a12 12 0 0 1 8-12Z" fill="url(#reflection)"/>
+  <path d="M21 9h82M9 20v28M153 123h64a14 14 0 0 0 14-14V91" stroke="#E1F4FF" stroke-opacity=".5" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,16 @@
+@use "../../app/styles/variables" as *;
+
+.breadcrumbs {
+  margin-bottom: 24px;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #a8bac7;
+  ol { display: flex; flex-wrap: wrap; gap: 8px 12px; margin: 0; padding: 0; list-style: none; }
+  li { display: flex; align-items: baseline; gap: 12px; }
+  a { display: inline-block; padding-block: 4px; color: #c6d0d8; }
+  a:hover { color: $lime; }
+  a:focus-visible { outline: 2px solid $lime; outline-offset: 4px; }
+  [aria-current] { padding-block: 4px; }
+}
+.separator { color: #82909d; }
