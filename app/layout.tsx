@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import SiteChrome from "@/components/layout/SiteChrome";
+import ServiceWorkerRegistration from "@/components/layout/ServiceWorkerRegistration";
 import { siteConfig } from "@/config";
 import "./globals.css";
 import Providers from "./providers";
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ru">
       <body>
+        <ServiceWorkerRegistration />
         <Providers>
           <SiteChrome>{children}</SiteChrome>
         </Providers>

@@ -3,11 +3,11 @@ import { siteConfig } from "@/config";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${siteConfig.name} — сообщения`,
+    name: siteConfig.name,
     short_name: siteConfig.name,
     description: siteConfig.description,
     id: "/admin/chat",
-    start_url: "/admin/chat",
+    start_url: "/",
     scope: "/",
     display: "standalone",
     background_color: "#07131c",

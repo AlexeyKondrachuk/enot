@@ -1,0 +1,74 @@
+# Independent stack: use -p enotdev -f docker-compose.enotdev.yml.
+x-app: &app
+  image: enotdev-app:local
+  env_file: [./deploy/enotdev/app.env]
+  environment: &app-environment
+    NODE_ENV: production
+    DATABASE_URL: postgresql://enotdev:${ENOTDEV_POSTGRES_PASSWORD:?Set the database password}@enotdev-postgres:5432/enotdev?schema=public
+    APP_ORIGIN: https://enotdev.su
+    CHAT_ALLOWED_ORIGIN: https://enotdev.su
+    NEXT_PUBLIC_SITE_URL: https://enotdev.su
+    NEXT_PUBLIC_CHAT_SOCKET_URL: https://enotdev.su
+    NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${ENOTDEV_VAPID_PUBLIC_KEY:?Set the public VAPID key}
+  depends_on:
+    enotdev-postgres:
+      condition: service_healthy
+
+services:
+  enotdev:
+    <<: *app
+    build:
+      context: .
+      dockerfile: deploy/enotdev/Dockerfile
+      args:
+        NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${ENOTDEV_VAPID_PUBLIC_KEY:?Set the public VAPID key}
+    restart: unless-stopped
+    environment:
+      <<: *app-environment
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+    expose: ["3000"]
+    networks: [database, proxy]
+
+  enotdev-chat:
+    <<: *app
+    restart: unless-stopped
+    command: ["npm", "run", "chat:start"]
+    environment:
+      <<: *app-environment
+      CHAT_SOCKET_PORT: "3001"
+    expose: ["3001"]
+    networks: [database, proxy]
+
+  enotdev-migrate:
+    <<: *app
+    profiles: ["tools"]
+    command: ["npx", "--no-install", "prisma", "migrate", "deploy"]
+    networks: [database]
+
+  enotdev-postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: enotdev
+      POSTGRES_PASSWORD: ${ENOTDEV_POSTGRES_PASSWORD:?Set the database password}
+      POSTGRES_DB: enotdev
+    volumes:
+      - enotdev_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    networks: [database]
+
+volumes:
+  enotdev_postgres_data:
+
+networks:
+  database:
+    internal: true
+  proxy:
+    external: true
+    name: ${ENOTDEV_PROXY_NETWORK:?Set the existing nginx network name}

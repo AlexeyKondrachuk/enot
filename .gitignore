@@ -48,3 +48,6 @@ next-env.d.ts
 /tmp/
 /output/
 /document.png
+
+# Production deployment secrets
+/deploy/enotdev/app.env

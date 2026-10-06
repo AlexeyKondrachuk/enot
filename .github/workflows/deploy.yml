@@ -1,0 +1,91 @@
+name: Deploy enotdev
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: enotdev-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_PORT: ${{ secrets.SSH_PORT }}
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Prepare SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          for name in SSH_HOST SSH_USER SSH_PORT DEPLOY_PATH SSH_PRIVATE_KEY SSH_KNOWN_HOSTS; do
+            if [[ -z "${!name}" ]]; then echo "Missing configuration: $name" >&2; exit 1; fi
+          done
+          [[ "$SSH_HOST" =~ ^[a-zA-Z0-9.-]+$ ]]
+          [[ "$SSH_USER" =~ ^[a-zA-Z0-9_-]+$ ]]
+          [[ "$SSH_PORT" =~ ^[0-9]+$ ]]
+          # Keep this workflow confined to the dedicated application directory.
+          [[ "$DEPLOY_PATH" == /home/it/enot ]]
+          umask 077
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/enot_actions
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          cat > ~/.ssh/config <<EOF
+          Host enot-deploy
+            HostName $SSH_HOST
+            User $SSH_USER
+            Port $SSH_PORT
+            IdentityFile ~/.ssh/enot_actions
+            IdentitiesOnly yes
+            BatchMode yes
+            StrictHostKeyChecking yes
+            ConnectTimeout 20
+          EOF
+          ssh enot-deploy "mkdir -p '$DEPLOY_PATH/deploy/enotdev' && chmod 700 '$DEPLOY_PATH'"
+
+      - name: Generate environment files
+        env:
+          ENOTDEV_POSTGRES_PASSWORD: ${{ secrets.ENOTDEV_POSTGRES_PASSWORD }}
+          ENOTDEV_VAPID_PUBLIC_KEY: ${{ secrets.ENOTDEV_VAPID_PUBLIC_KEY }}
+          CHAT_ADMIN_PASSWORD: ${{ secrets.CHAT_ADMIN_PASSWORD }}
+          CHAT_SESSION_SECRET: ${{ secrets.CHAT_SESSION_SECRET }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          ENOTDEV_PROXY_NETWORK: ${{ vars.ENOTDEV_PROXY_NETWORK }}
+          VAPID_SUBJECT: ${{ vars.VAPID_SUBJECT }}
+        run: python3 deploy/enotdev/write-env.py
+
+      - name: Transfer application
+        run: |
+          set -euo pipefail
+          rsync -az --delete --timeout=60 \
+            --exclude='.git/' --exclude='.github/' \
+            --exclude='node_modules/' --exclude='.next/' --exclude='generated/' \
+            --exclude='output/' --exclude='tmp/' \
+            --exclude='.env*' --exclude='deploy/enotdev/app.env' \
+            ./ "enot-deploy:$DEPLOY_PATH/"
+          # Transfer secrets separately; excluded files above are protected from deletion.
+          scp .env.enotdev "enot-deploy:$DEPLOY_PATH/.env.enotdev"
+          scp deploy/enotdev/app.env "enot-deploy:$DEPLOY_PATH/deploy/enotdev/app.env"
+
+      - name: Deploy
+        run: |
+          set -euo pipefail
+          ssh enot-deploy "cd '$DEPLOY_PATH' && chmod 600 .env.enotdev deploy/enotdev/app.env && bash deploy/enotdev/deploy.sh"
+
+      - name: Remove runner secrets
+        if: always()
+        run: rm -f ~/.ssh/enot_actions .env.enotdev deploy/enotdev/app.env
