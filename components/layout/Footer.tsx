@@ -49,6 +49,7 @@ export default function Footer() {
       <div className={styles.footerBottom}>
         <span>© 2026 {siteConfig.name}</span>
         <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
+        <Link href="/admin/login" prefetch={false}>Вход</Link>
         <a href="#top">Наверх ↑</a>
       </div>
     </footer>
