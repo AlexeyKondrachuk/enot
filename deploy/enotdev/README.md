@@ -107,7 +107,7 @@ ENOTDEV_POSTGRES_PASSWORD, ENOTDEV_VAPID_PUBLIC_KEY, CHAT_ADMIN_PASSWORD,
 CHAT_SESSION_SECRET, VAPID_PRIVATE_KEY.
 
 Repository variables: DEPLOY_PATH=/home/it/enot,
-ENOTDEV_PROXY_NETWORK=app_app-network, VAPID_SUBJECT=mailto:ваш-email.
+ENOTDEV_PROXY_NETWORK=app_app-network, VAPID_SUBJECT=mailto:dev@enotdev.su.
 Пароль PostgreSQL должен быть hex, остальные значения env — без пробелов,
 кавычек и символов интерполяции. Используйте сгенерированные hex-секреты и VAPID-пару.
 

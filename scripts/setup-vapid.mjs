@@ -14,7 +14,7 @@ function setVariable(source, name, value) {
 
 let next = setVariable(current, "NEXT_PUBLIC_VAPID_PUBLIC_KEY", keys.publicKey);
 next = setVariable(next, "VAPID_PRIVATE_KEY", keys.privateKey);
-next = setVariable(next, "VAPID_SUBJECT", "mailto:hello@enot.dev");
+next = setVariable(next, "VAPID_SUBJECT", "mailto:dev@enotdev.su");
 fs.writeFileSync(envPath, next, "utf8");
 
 console.log("VAPID keys were generated and saved to .env.local.");
