@@ -51,3 +51,4 @@ next-env.d.ts
 
 # Production deployment secrets
 /deploy/enotdev/app.env
+/.enotdev-deploy.lock

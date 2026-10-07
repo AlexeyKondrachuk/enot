@@ -75,15 +75,31 @@ jobs:
             --exclude='.git/' --exclude='.github/' \
             --exclude='node_modules/' --exclude='.next/' --exclude='generated/' \
             --exclude='output/' --exclude='tmp/' \
+            --exclude='.enotdev-deploy.lock' \
             --exclude='.env*' --exclude='deploy/enotdev/app.env' \
             ./ "enot-deploy:$DEPLOY_PATH/"
           # Transfer secrets separately; excluded files above are protected from deletion.
           scp .env.enotdev "enot-deploy:$DEPLOY_PATH/.env.enotdev"
           scp deploy/enotdev/app.env "enot-deploy:$DEPLOY_PATH/deploy/enotdev/app.env"
 
-      - name: Deploy
+      - name: Build image on GitHub runner
+        env:
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ secrets.ENOTDEV_VAPID_PUBLIC_KEY }}
         run: |
           set -euo pipefail
+          server_arch=$(ssh enot-deploy uname -m)
+          if [[ "$server_arch" != x86_64 ]]; then
+            echo "Unsupported server architecture: $server_arch; runner image requires x86_64" >&2
+            exit 1
+          fi
+          docker build --platform linux/amd64 \
+            --build-arg NEXT_PUBLIC_VAPID_PUBLIC_KEY \
+            -f deploy/enotdev/Dockerfile -t enotdev-app:local .
+
+      - name: Load image and deploy without building on server
+        run: |
+          set -euo pipefail
+          docker image save enotdev-app:local | ssh enot-deploy 'docker image load'
           ssh enot-deploy "cd '$DEPLOY_PATH' && chmod 600 .env.enotdev deploy/enotdev/app.env && bash deploy/enotdev/deploy.sh"
 
       - name: Remove runner secrets
