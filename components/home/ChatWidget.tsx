@@ -6,6 +6,7 @@ import type { ChatMessage } from "@/Redux/chatApi";
 import { useGetMessagesQuery, useSendMessageMutation } from "@/hooks/useChat";
 import { useVisitorChatSocket } from "@/hooks/useVisitorChatSocket";
 import { useAudioUnlock } from "@/hooks/useAudioUnlock";
+import { trackChatEnquiry } from "@/lib/metrika-events";
 import {
   isSoundEnabled,
   playErrorSound,
@@ -105,6 +106,7 @@ export default function ChatWidget() {
     try {
       if (connected) await sendSocketMessage(message);
       else await sendMessage(message).unwrap();
+      trackChatEnquiry();
       playSendSound();
       setText("");
     } catch {

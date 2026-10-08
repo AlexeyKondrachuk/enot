@@ -3,6 +3,8 @@
 import Script from "next/script";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { siteConfig } from "@/config";
+import type { MetrikaGoal } from "@/lib/metrika-events";
 
 type MetrikaWindow = Window & {
   ym?: (id: number, method: string, ...args: unknown[]) => void;
@@ -47,6 +49,31 @@ export default function YandexMetrika({ counterId }: { counterId: number }) {
     });
     previousUrl.current = url;
   }, [counterId, pathname, ready, isAdmin]);
+
+  useEffect(() => {
+    if (!ready || isAdmin) return;
+    const reachGoal = (goal: MetrikaGoal) => {
+      (window as MetrikaWindow).ym?.(counterId, "reachGoal", goal);
+    };
+    const onGoal = (event: Event) => {
+      reachGoal((event as CustomEvent<MetrikaGoal>).detail);
+    };
+    const onClick = (event: MouseEvent) => {
+      if (!(event.target instanceof Element)) return;
+      const link = event.target.closest("a[href]");
+      if (!(link instanceof HTMLAnchorElement)) return;
+      const url = new URL(link.href);
+      if (url.protocol === "tel:") reachGoal("phone_click");
+      else if (url.protocol === "mailto:") reachGoal("email_click");
+      else if (url.origin + url.pathname === siteConfig.telegram) reachGoal("telegram_click");
+    };
+    window.addEventListener("enot:metrika-goal", onGoal);
+    document.addEventListener("click", onClick, true);
+    return () => {
+      window.removeEventListener("enot:metrika-goal", onGoal);
+      document.removeEventListener("click", onClick, true);
+    };
+  }, [counterId, ready, isAdmin]);
 
   if (isAdmin) return null;
 
