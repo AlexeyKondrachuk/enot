@@ -16,7 +16,6 @@ export default function Footer() {
           <Link href="/#projects">Проекты</Link>
           <Link href="/about">Обо мне</Link>
           <Link href="/documents">Документы</Link>
-          <a href="#contact">Контакты</a>
         </nav>
         <div className={styles.socials}>
           <a href={siteConfig.telegram} target="_blank" rel="noreferrer">
@@ -27,6 +26,24 @@ export default function Footer() {
           </a>
         </div>
       </div>
+      <section
+        id="footer-contacts"
+        className={styles.footerContacts}
+        aria-labelledby="footer-contacts-title"
+      >
+        <div>
+          <h2 id="footer-contacts-title">Контакты и реквизиты</h2>
+          <p>{siteConfig.owner}</p>
+          <p>ИНН {siteConfig.inn}</p>
+        </div>
+        <address>
+          <p>{siteConfig.address}</p>
+          <a href={`tel:${siteConfig.phone.replace(/[^+\d]/g, "")}`}>
+            {siteConfig.phone}
+          </a>
+          <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
+        </address>
+      </section>
       <a
         className={styles.hostingPartner}
         href="https://beget.com/p1234567890/vip"

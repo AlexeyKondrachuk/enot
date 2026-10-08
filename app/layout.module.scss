@@ -98,6 +98,26 @@
   gap: 34px;
   font-size: 14px;
 }
+.footerContacts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px 48px;
+  padding: 28px 0;
+  margin-bottom: 28px;
+  border-top: 1px solid $line;
+  border-bottom: 1px solid $line;
+  color: #d5dae0;
+  font-size: 14px;
+  line-height: 1.7;
+  scroll-margin-top: 24px;
+
+  h2 { margin: 0 0 12px; color: $lime; font-size: 18px; }
+  p { margin: 0; }
+  address { display: grid; align-content: start; gap: 8px; font-style: normal; }
+  a { width: fit-content; overflow-wrap: anywhere; }
+  a:hover { color: $lime; }
+  a:focus-visible { outline: 2px solid $lime; outline-offset: 4px; }
+}
 .footerBottom {
   border-top: 1px solid $line;
   padding-top: 28px;
@@ -227,6 +247,9 @@
   }
   .socials {
     justify-self: start;
+  }
+  .footerContacts {
+    grid-template-columns: minmax(0, 1fr);
   }
   .footerBottom {
     flex-wrap: wrap;
