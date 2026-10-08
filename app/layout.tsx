@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import SiteChrome from "@/components/layout/SiteChrome";
 import ServiceWorkerRegistration from "@/components/layout/ServiceWorkerRegistration";
+import YandexMetrika from "@/components/layout/YandexMetrika";
 import { siteConfig } from "@/config";
 import "./globals.css";
 import Providers from "./providers";
@@ -24,9 +25,11 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  const metrikaId = Number(process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID ?? "113568821");
   return (
     <html lang="ru">
       <body>
+        {Number.isSafeInteger(metrikaId) && metrikaId > 0 && <YandexMetrika counterId={metrikaId} />}
         <ServiceWorkerRegistration />
         <Providers>
           <SiteChrome>{children}</SiteChrome>

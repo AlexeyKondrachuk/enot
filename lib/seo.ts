@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { siteConfig } from "@/config";
 
 // Set the public production origin, without a path, before deployment.
-export const siteUrl = new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://enotgo.ru").origin;
+export const siteUrl = new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://enotdev.su").origin;
 
 export function pageMetadata(title: string, description: string, path: string): Metadata {
   const fullTitle = `${title} — ${siteConfig.name}`;

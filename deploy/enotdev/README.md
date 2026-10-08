@@ -41,7 +41,7 @@ npm run push:keys
 Секреты передаются только при запуске. Домен https://enotdev.su и URL чата
 задаются при сборке и запуске. Dockerfile.dockerignore исключает локальные
 .env, .env.local, generated, node_modules и .next из контекста сборки.
-Настройки разработки и fallback enotgo.ru в исходниках не используются в production.
+Основной домен в исходниках и production — enotdev.su.
 
 ## Первый запуск
 

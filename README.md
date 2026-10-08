@@ -24,7 +24,8 @@ Next.js 16, React 19, TypeScript, SCSS, Redux Toolkit, Prisma 7, PostgreSQL, Soc
 ## Настройки
 
 - Контакты и описание сайта: `config.ts`.
-- Основной SEO-домен: `NEXT_PUBLIC_SITE_URL` (по умолчанию https://enotgo.ru).
+- Основной SEO-домен: `NEXT_PUBLIC_SITE_URL` (по умолчанию https://enotdev.su).
+- Яндекс Метрика: `NEXT_PUBLIC_YANDEX_METRIKA_ID` (по умолчанию 113568821). Пустое значение отключает счётчик. После изменения переменной пересоберите сайт.
 - Публичный URL сервера чата: `NEXT_PUBLIC_CHAT_SOCKET_URL`.
 - Разрешённый origin сайта для сервера чата: `CHAT_ALLOWED_ORIGIN`.
 - Origin для серверных запросов: `APP_ORIGIN`.
