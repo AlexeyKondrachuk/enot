@@ -17,13 +17,13 @@ export function pageMetadata(title: string, description: string, path: string): 
       title: fullTitle,
       description,
       ...(siteUrl ? { url: new URL(path, siteUrl).href } : {}),
-      images: [{ url: "/pwa-icon-512.png", width: 512, height: 512, alt: siteConfig.name }],
+      images: [{ url: "/og-cover.jpg", width: 1200, height: 630, alt: siteConfig.name }],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title: fullTitle,
       description,
-      images: ["/pwa-icon-512.png"],
+      images: ["/og-cover.jpg"],
     },
   };
 }

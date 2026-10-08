@@ -39,16 +39,8 @@ self.addEventListener("push", (event) => {
     try {
       const windowClients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
 
-      if (!payload.alwaysShow) {
-        // Видимая вкладка: приложение само отыграет звук и бейдж — глушим пуш
-        if (windowClients.some((client) => client.visibilityState === "visible")) return;
-      }
-
-      // Приложение закрыто полностью — ставим бейдж на иконку
-      if (windowClients.length === 0) {
-        await self.registration.setAppBadge?.(1);
-      }
-
+      // Каждый push показывает системное уведомление, даже если открыта другая
+      // страница сайта. Звук Socket.IO не заменяет уведомление в фоне.
       await self.registration.showNotification(payload.title, {
         body: payload.body,
         icon: "/pwa-icon-192.png",
@@ -60,6 +52,11 @@ self.addEventListener("push", (event) => {
         vibrate: [120, 60, 120],
         data: { url: payload.url || DEFAULT_PUSH.url },
       });
+
+      // Ошибка необязательного бейджа не должна мешать показу уведомления.
+      if (windowClients.length === 0) {
+        try { await self.navigator.setAppBadge?.(1); } catch { /* badge is optional */ }
+      }
     } catch (error) {
       console.error("[sw] Не удалось показать уведомление:", error);
     }
@@ -74,7 +71,7 @@ self.addEventListener("notificationclick", (event) => {
 
   event.waitUntil((async () => {
     // Открыли приложение — бейдж больше не нужен, дальше счётчиком управляет страница
-    await self.registration.clearAppBadge?.();
+    try { await self.navigator.clearAppBadge?.(); } catch { /* badge is optional */ }
 
     const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
 
