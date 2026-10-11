@@ -1,6 +1,8 @@
 import type { LandingData } from "@/Redux/api";
 import styles from "@/app/page.module.scss";
 import ServiceIcon from "./ServiceIcon";
+import Link from "next/link";
+import { servicePages } from "@/data/services";
 
 export default function Services({
   items,
@@ -31,8 +33,13 @@ export default function Services({
             </div>
             <h3>{service.title}</h3>
             <p>{service.description}</p>
+            {service.title === "Корпоративные сайты" && <Link href={servicePages.corporate.path}>Подробнее об услуге →</Link>}
+            {service.title === "Интернет-магазины" && <Link href={servicePages.store.path}>Подробнее об услуге →</Link>}
           </article>
         ))}
+      </div>
+      <div className={styles.actions} style={{ marginTop: 28 }}>
+        <Link className={styles.secondaryButton} href={servicePages.websites.path}>Создание сайтов: как начать <span aria-hidden="true">→</span></Link>
       </div>
     </section>
   );

@@ -155,7 +155,7 @@ io.on("connection", (socket: Socket) => {
       await socket.join(roomFor(conversation.id));
       const messages = await prisma.message.findMany({
         where: { conversationId: conversation.id },
-        orderBy: { createdAt: "asc" },
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
         take: 200,
       });
       acknowledge?.({
@@ -163,7 +163,7 @@ io.on("connection", (socket: Socket) => {
         data: {
           conversationId: conversation.id,
           status: conversation.status,
-          messages: messages.map(serializeMessage),
+          messages: messages.reverse().map(serializeMessage),
         },
       });
       await markAsRead(identity, conversation.id);
@@ -197,7 +197,7 @@ io.on("connection", (socket: Socket) => {
           where: { id: conversation.id },
           data: {
             lastMessageAt: new Date(),
-            ...(identity.role === "visitor" ? { status: "OPEN" as const } : {}),
+            ...(identity.role === "visitor" ? { status: "OPEN" as const, archived: false } : {}),
           },
         }),
         prisma.message.create({

@@ -3,6 +3,8 @@ import type { ChatMessage } from "./chatApi";
 
 export type AdminConversation = {
   id: string;
+  name: string | null;
+  archived: boolean;
   status: "OPEN" | "CLOSED";
   createdAt: string;
   updatedAt: string;
@@ -15,8 +17,8 @@ export const adminChatApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: "/api/chat/admin" }),
   tagTypes: ["AdminConversations", "AdminMessages"],
   endpoints: (builder) => ({
-    getAdminConversations: builder.query<AdminConversation[], void>({
-      query: () => "conversations",
+    getAdminConversations: builder.query<{ items: AdminConversation[]; hasMore: boolean }, { archived: boolean; limit: number }>({
+      query: ({ archived, limit }) => `conversations?archived=${archived}&limit=${limit}`,
       providesTags: ["AdminConversations"],
     }),
     getAdminMessages: builder.query<ChatMessage[], string>({
@@ -38,6 +40,10 @@ export const adminChatApi = createApi({
       query: ({ conversationId, status }) => ({ url: `conversations/${conversationId}`, method: "PATCH", body: { status } }),
       invalidatesTags: ["AdminConversations"],
     }),
+    updateConversation: builder.mutation<AdminConversation, { conversationId: string; name?: string; archived?: boolean }>({
+      query: ({ conversationId, ...body }) => ({ url: `conversations/${conversationId}`, method: "PATCH", body }),
+      invalidatesTags: ["AdminConversations"],
+    }),
   }),
 });
 
@@ -47,4 +53,5 @@ export const {
   useSendAdminMessageMutation,
   useDeleteAdminMessageMutation,
   useSetConversationStatusMutation,
+  useUpdateConversationMutation,
 } = adminChatApi;

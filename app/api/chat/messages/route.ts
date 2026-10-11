@@ -29,14 +29,14 @@ export async function GET(request: NextRequest) {
       select: {
         id: true,
         status: true,
-        messages: { orderBy: { createdAt: "asc" }, take: 100 },
+        messages: { orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: 100 },
       },
     });
 
     return NextResponse.json({
       conversationId: conversation?.id ?? null,
       status: conversation?.status ?? null,
-      messages: conversation?.messages ?? [],
+      messages: conversation?.messages.reverse() ?? [],
     });
   } catch {
     return NextResponse.json({ error: "Чат временно недоступен" }, { status: 503 });
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     const prisma = getPrisma();
     const conversation = await prisma.conversation.upsert({
       where: { visitorToken },
-      update: { status: "OPEN", lastMessageAt: new Date() },
+      update: { status: "OPEN", archived: false, lastMessageAt: new Date() },
       create: { visitorToken },
       select: { id: true },
     });

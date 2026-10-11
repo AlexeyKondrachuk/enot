@@ -5,7 +5,7 @@ export const siteConfig = {
   email: "dev@enotdev.su",
   owner: "Самозанятый Кондрачук Алексей Степанович",
   inn: "632306327524",
-  address: "Самарская область, г. Тольятти, ул. Свердлова, 25",
+  address: "Самарская область, г. Тольятти",
   telegram: "https://t.me/Alexeyfast",
   github: "https://github.com/AlexeyKondrachuk",
 } as const;

@@ -9,6 +9,7 @@ import {
   useDeleteAdminMessageMutation,
   useSendAdminMessageMutation,
   useSetConversationStatusMutation,
+  useUpdateConversationMutation,
 } from "@/hooks/useAdminChat";
 import { useAdminChatSocket } from "@/hooks/useAdminChatSocket";
 import { useAudioUnlock } from "@/hooks/useAudioUnlock";
@@ -21,6 +22,7 @@ import {
 import { bumpUnreadFor, initUnreadReset } from "@/lib/unread-badge";
 import PushNotificationButton from "./PushNotificationButton";
 import SoundToggleButton from "./SoundToggleButton";
+import type { ChatMessage } from "@/Redux/chatApi";
 
 function shortTime(value: string) {
   return new Intl.DateTimeFormat("ru-RU", {
@@ -41,11 +43,21 @@ export default function AdminChatDashboard() {
   useAudioUnlock();
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [archived, setArchived] = useState(false);
+  const [limit, setLimit] = useState(50);
+  const [editingName, setEditingName] = useState<string | null>(null);
+  const [name, setName] = useState("");
+  const [olderByChat, setOlderByChat] = useState<Record<string, ChatMessage[]>>({});
+  const [historyComplete, setHistoryComplete] = useState<Set<string>>(() => new Set());
+  const [loadingOlder, setLoadingOlder] = useState(false);
+  const prependScrollRef = useRef<{ id: string; height: number; top: number } | null>(null);
   const [text, setText] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [unreadIds, setUnreadIds] = useState<Set<string>>(() => new Set());
   const messageListRef = useRef<HTMLDivElement>(null);
+  const nearBottomRef = useRef(true);
+  const scrolledConversationRef = useRef<string | null>(null);
 
   // «Увиденное» в активном диалоге + штамп, какому activeId он принадлежит
   const seenForRef = useRef<string | null>(null);
@@ -53,11 +65,14 @@ export default function AdminChatDashboard() {
   // Последнее сообщение по каждому диалогу — для диффа фоновых
   const seenConvRef = useRef<Map<string, string> | null>(null);
 
-  const { data: conversations = [], isError } = useGetAdminConversationsQuery(
-    undefined,
+  const { currentData, data: previousPage, isError, isFetching } = useGetAdminConversationsQuery(
+    { archived, limit },
     { pollingInterval: 5000 },
   );
-  const activeId = selectedId ?? conversations[0]?.id ?? null;
+  const conversationPage = currentData ?? (previousPage?.items.every((item) => item.archived === archived) ? previousPage : undefined);
+  const conversations = useMemo(() => conversationPage?.items ?? [], [conversationPage]);
+  const activeId = conversations.some((item) => item.id === selectedId)
+    ? selectedId : conversations[0]?.id ?? null;
   const {
     connected,
     send: sendSocketMessage,
@@ -68,7 +83,13 @@ export default function AdminChatDashboard() {
     pollingInterval: connected ? 0 : 3000,
   });
   const [sendReply, { isLoading: sending }] = useSendAdminMessageMutation();
+  const displayedMessages = useMemo(() => {
+    const unique = new Map<string, ChatMessage>();
+    for (const message of [...(olderByChat[activeId ?? ""] ?? []), ...messages]) unique.set(message.id, message);
+    return [...unique.values()].sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id));
+  }, [olderByChat, messages, activeId]);
   const [deleteMessage] = useDeleteAdminMessageMutation();
+  const [updateConversation, { isLoading: updating }] = useUpdateConversationMutation();
   const [setStatus, { isLoading: statusLoading }] =
     useSetConversationStatusMutation();
   const selected = useMemo(
@@ -146,19 +167,78 @@ export default function AdminChatDashboard() {
   }, [conversations, activeId]);
 
   useEffect(() => {
+    const pending = prependScrollRef.current;
+    const element = messageListRef.current;
+    if (pending?.id === activeId && element) {
+      element.scrollTop = pending.top + element.scrollHeight - pending.height;
+      prependScrollRef.current = null;
+      return;
+    }
+    const changedConversation = scrolledConversationRef.current !== activeId;
+    scrolledConversationRef.current = activeId;
+    if (!changedConversation && !nearBottomRef.current) return;
     messageListRef.current?.scrollTo({
       top: messageListRef.current.scrollHeight,
-      behavior: "smooth",
+      behavior: changedConversation ? "instant" : "smooth",
     });
-  }, [messages.length]);
+    nearBottomRef.current = true;
+  }, [displayedMessages, activeId]);
 
   const selectConversation = (id: string) => {
+    setEditingName(null);
+    setActionError(null);
     setSelectedId(id);
     setUnreadIds((prev) => {
       const next = new Set(prev);
       next.delete(id);
       return next;
     });
+  };
+
+  const changeFolder = (nextArchived: boolean) => {
+    setArchived(nextArchived);
+    setLimit(50);
+    setSelectedId(null);
+    setEditingName(null);
+    setActionError(null);
+    seenConvRef.current = null;
+  };
+
+  const saveName = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!activeId || editingName !== activeId || updating) return;
+    setActionError(null);
+    try {
+      await updateConversation({ conversationId: activeId, name }).unwrap();
+      setEditingName(null);
+    } catch { setActionError("Не удалось сохранить имя чата."); }
+  };
+
+  const toggleArchive = async () => {
+    if (!selected || updating) return;
+    setActionError(null);
+    try {
+      await updateConversation({ conversationId: selected.id, archived: !selected.archived }).unwrap();
+      setSelectedId(null);
+      setEditingName(null);
+    } catch { setActionError("Не удалось переместить чат. Попробуйте снова."); }
+  };
+
+  const loadOlder = async () => {
+    if (!activeId || !displayedMessages.length || loadingOlder) return;
+    const id = activeId;
+    setLoadingOlder(true);
+    setActionError(null);
+    try {
+      const response = await fetch(`/api/chat/admin/conversations/${id}/messages?before=${encodeURIComponent(displayedMessages[0].id)}`);
+      if (!response.ok) throw new Error("Unable to load history");
+      const older = await response.json() as ChatMessage[];
+      const element = messageListRef.current;
+      if (element) prependScrollRef.current = { id, height: element.scrollHeight, top: element.scrollTop };
+      setOlderByChat((prev) => ({ ...prev, [id]: [...older, ...(prev[id] ?? [])] }));
+      if (older.length < 200) setHistoryComplete((prev) => new Set([...prev, id]));
+    } catch { setActionError("Не удалось загрузить историю переписки."); }
+    finally { setLoadingOlder(false); }
   };
 
   const submit = async (event: FormEvent) => {
@@ -197,6 +277,7 @@ export default function AdminChatDashboard() {
       if (connected) await removeSocketMessage(messageId, activeId);
       else
         await deleteMessage({ conversationId: activeId, messageId }).unwrap();
+      setOlderByChat((prev) => ({ ...prev, [activeId]: (prev[activeId] ?? []).filter((message) => message.id !== messageId) }));
     } catch {
       playErrorSound();
       setActionError(
@@ -236,10 +317,14 @@ export default function AdminChatDashboard() {
             {conversations.filter((item) => item.status === "OPEN").length}
           </span>
         </div>
+        <div className={styles.folderTabs} aria-label="Разделы диалогов">
+          <button type="button" aria-pressed={!archived} onClick={() => changeFolder(false)}>Чаты</button>
+          <button type="button" aria-pressed={archived} onClick={() => changeFolder(true)}>Архив</button>
+        </div>
         <div className={styles.conversationList}>
           {conversations.length === 0 && (
             <div className={styles.emptyList}>
-              <b>Пока тихо</b>
+              <b>{isFetching ? "Загрузка…" : archived ? "Архив пуст" : "Пока тихо"}</b>
               <span>Новые обращения появятся здесь</span>
             </div>
           )}
@@ -252,12 +337,13 @@ export default function AdminChatDashboard() {
                 }
                 onClick={() => selectConversation(conversation.id)}
                 key={conversation.id}
+                title={conversation.name || `Посетитель ${conversation.id.slice(-5)}`}
               >
                 <span className={styles.visitorAvatar}>
                   {conversation.id.slice(-2).toUpperCase()}
                 </span>
                 <span className={styles.conversationCopy}>
-                  <b>Посетитель {conversation.id.slice(-5)}</b>
+                  <b>{conversation.name || `Посетитель ${conversation.id.slice(-5)}`}</b>
                   <small>{last?.text ?? "Новый диалог"}</small>
                 </span>
                 <span className={styles.conversationMeta}>
@@ -276,6 +362,11 @@ export default function AdminChatDashboard() {
               </button>
             );
           })}
+          {conversationPage?.hasMore && (
+            <button type="button" disabled={isFetching} onClick={() => setLimit((value) => value + 50)}>
+              {isFetching ? "Загрузка…" : "Загрузить ещё"}
+            </button>
+          )}
         </div>
         <div className={styles.sidebarActions}>
           <SoundToggleButton />
@@ -294,28 +385,53 @@ export default function AdminChatDashboard() {
                 {selected.id.slice(-2).toUpperCase()}
               </div>
               <div>
-                <b>Посетитель {selected.id.slice(-5)}</b>
+                <b title={selected.name || undefined}>{selected.name || `Посетитель ${selected.id.slice(-5)}`}</b>
                 <span>
-                  {selected.status === "OPEN"
+                  {selected.archived ? "В архиве" : selected.status === "OPEN"
                     ? "Активный диалог"
                     : "Диалог закрыт"}
                 </span>
               </div>
+              <div className={styles.dialogActions}>
+              <button type="button" onClick={() => { setName(selected.name ?? ""); setEditingName(selected.id); }}>
+                Имя чата
+              </button>
+              <button type="button" disabled={updating} onClick={() => void toggleArchive()}>
+                {selected.archived ? "Вернуть" : "В архив"}
+              </button>
               <button
                 disabled={statusLoading}
-                onClick={() =>
-                  setStatus({
+                onClick={async () => {
+                  setActionError(null);
+                  try { await setStatus({
                     conversationId: selected.id,
                     status: selected.status === "OPEN" ? "CLOSED" : "OPEN",
-                  })
-                }
+                  }).unwrap(); } catch { setActionError("Не удалось изменить статус чата."); }
+                }}
               >
                 {selected.status === "OPEN" ? "Закрыть" : "Открыть снова"}
               </button>
+              </div>
+              {editingName === selected.id && (
+                <form className={styles.nameEditor} onSubmit={saveName}>
+                  <label htmlFor="chat-name">Имя чата (видно только администратору)</label>
+                  <input id="chat-name" value={name} maxLength={80} onChange={(event) => setName(event.target.value)} placeholder="Например, Иван — интернет-магазин" autoFocus />
+                  <small>Пустое имя вернёт название «Посетитель».</small>
+                  <div><button disabled={updating}>Сохранить</button><button type="button" onClick={() => setEditingName(null)}>Отмена</button></div>
+                </form>
+              )}
             </header>
-            <div className={styles.adminMessages} ref={messageListRef}>
+            <div className={styles.adminMessages} ref={messageListRef} onScroll={(event) => {
+              const element = event.currentTarget;
+              nearBottomRef.current = element.scrollHeight - element.scrollTop - element.clientHeight < 80;
+            }}>
               <p className={styles.adminDate}>История переписки</p>
-              {messages.map((message) => (
+              {activeId && messages.length >= 200 && !historyComplete.has(activeId) && (
+                <button className={styles.loadHistory} type="button" disabled={loadingOlder} onClick={() => void loadOlder()}>
+                  {loadingOlder ? "Загрузка…" : "Загрузить предыдущие сообщения"}
+                </button>
+              )}
+              {displayedMessages.map((message) => (
                 <div
                   className={`${styles.adminMessageRow} ${message.sender === "OPERATOR" ? styles.adminMessageOwn : ""}`}
                   key={message.id}

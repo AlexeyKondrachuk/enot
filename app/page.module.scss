@@ -243,6 +243,15 @@
   line-height: 1.55;
   font-size: 15px;
 }
+.services article > a {
+  display: inline-flex;
+  margin-top: 20px;
+  padding: 8px 0;
+  color: $lime;
+  font-size: 14px;
+  &:hover { text-decoration: underline; }
+  &:focus-visible { outline: 2px solid $lime; outline-offset: 4px; }
+}
 .projects {
   margin-top: 44px;
   display: grid;

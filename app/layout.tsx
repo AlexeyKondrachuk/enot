@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   const metrikaId = Number(process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID ?? "113568821");
   return (
-    <html lang="ru">
+    <html lang="ru" data-scroll-behavior="smooth">
       <body>
         {Number.isSafeInteger(metrikaId) && metrikaId > 0 && <YandexMetrika counterId={metrikaId} />}
         <ServiceWorkerRegistration />

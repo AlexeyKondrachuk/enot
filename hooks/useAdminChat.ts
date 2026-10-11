@@ -4,4 +4,5 @@ export {
   useSendAdminMessageMutation,
   useDeleteAdminMessageMutation,
   useSetConversationStatusMutation,
+  useUpdateConversationMutation,
 } from "@/Redux/adminChatApi";

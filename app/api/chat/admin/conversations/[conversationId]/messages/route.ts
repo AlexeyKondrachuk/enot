@@ -11,16 +11,25 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   if (!isAdminRequest(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { conversationId } = await params;
   const prisma = getPrisma();
+  const before = request.nextUrl.searchParams.get("before");
+  const cursor = before ? await prisma.message.findFirst({ where: { id: before, conversationId } }) : null;
+  if (before && !cursor) return NextResponse.json({ error: "Message not found" }, { status: 404 });
   await prisma.message.updateMany({
     where: { conversationId, sender: MessageSender.VISITOR, readAt: null },
     data: { readAt: new Date() },
   });
   const messages = await prisma.message.findMany({
-    where: { conversationId },
-    orderBy: { createdAt: "asc" },
+    where: {
+      conversationId,
+      ...(cursor ? { OR: [
+        { createdAt: { lt: cursor.createdAt } },
+        { createdAt: cursor.createdAt, id: { lt: cursor.id } },
+      ] } : {}),
+    },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     take: 200,
   });
-  return NextResponse.json(messages);
+  return NextResponse.json(messages.reverse());
 }
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ conversationId: string }> }) {

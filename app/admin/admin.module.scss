@@ -121,14 +121,14 @@
 .adminShell {
   height: 100dvh;
   display: grid;
-  grid-template-columns: 340px 1fr;
+  grid-template-columns: 340px minmax(0, 1fr);
   overflow: hidden;
 }
 .adminSidebar {
   min-height: 0;
   padding: 18px 12px 14px;
   display: grid;
-  grid-template-rows: auto auto 1fr auto;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
   border-right: 1px solid rgba(255, 255, 255, 0.09);
   background: rgba(11, 26, 36, 0.96);
 }
@@ -212,6 +212,51 @@
     background: rgba(255, 255, 255, 0.085);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
   }
+}
+.folderTabs {
+  display: flex;
+  gap: 6px;
+  padding: 0 10px 12px;
+  button {
+    flex: 1;
+    padding: 9px 4px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 10px;
+    background: transparent;
+    color: #aeb9c0;
+    cursor: pointer;
+    &[aria-pressed="true"] { color: $lime; background: rgba(215, 255, 56, .08); }
+  }
+}
+.dialogActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  button {
+    padding: 9px 12px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 10px;
+    color: #aeb9c0;
+    background: rgba(255, 255, 255, .04);
+    cursor: pointer;
+    &:hover { color: $lime; }
+    &:disabled { opacity: .5; cursor: default; }
+  }
+}
+.nameEditor {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid $line;
+  border-radius: 14px;
+  font-size: 12px;
+  input { min-width: 0; width: 100%; padding: 10px; border: 1px solid $line; border-radius: 8px; color: white; background: #132531; }
+  small { color: #aeb9c0; }
+  > div { display: flex; flex-wrap: wrap; gap: 8px; }
+  button { padding: 8px 12px; border: 0; border-radius: 8px; color: #071119; background: $lime; cursor: pointer; }
 }
 .visitorAvatar {
   width: 39px;
@@ -357,10 +402,14 @@
   background: rgba(255, 255, 255, 0.018);
   backdrop-filter: blur(20px);
   > div:nth-child(2) {
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 3px;
     b {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       font-size: 14px;
     }
     span {
@@ -396,6 +445,17 @@
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.13em;
+}
+.loadHistory {
+  display: block;
+  margin: 0 auto 20px;
+  max-width: 100%;
+  padding: 10px;
+  border: 1px solid $line;
+  border-radius: 10px;
+  color: $lime;
+  background: transparent;
+  cursor: pointer;
 }
 .adminMessageRow {
   display: flex;
@@ -607,9 +667,13 @@
     justify-items: center;
     padding: 9px;
   }
-  .conversationCopy,
   .conversationMeta {
     display: none;
+  }
+  .conversationCopy {
+    width: 100%;
+    b { font-size: 9px; text-align: center; }
+    small { display: none; }
   }
   .sidebarActions {
     padding-inline: 0;
@@ -632,11 +696,15 @@
   }
   .dialogHeader {
     padding-inline: 14px;
+    grid-template-columns: auto minmax(0, 1fr);
     > button {
       padding: 8px;
       max-width: 75px;
     }
   }
+  .dialogActions { grid-column: 1 / -1; justify-content: flex-start; button { padding: 8px; font-size: 11px; } }
+  .folderTabs { flex-direction: column; padding-inline: 0; button { font-size: 11px; } }
+  .adminMessageMeta { flex-wrap: wrap; }
   .adminMessages {
     padding-inline: 14px;
   }
