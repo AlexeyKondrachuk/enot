@@ -79,12 +79,9 @@ const projectCount = String(projects.length).padStart(2, "0");
 export default function Projects() {
   const [project, setProject] = useState(0);
   const [view, setView] = useState<View>("all");
-  const [transition, setTransition] = useState<"idle" | "out" | "in">("idle");
-  const direction = useRef(1);
   const changeProject = (step = 1) => {
-    if (transition !== "idle") return;
-    direction.current = step;
-    setTransition("out");
+    setProject((current) => (current + step + projects.length) % projects.length);
+    setView("all");
   };
   const currentProject = projects[project];
   const screens = currentProject.screens;
@@ -134,18 +131,6 @@ export default function Projects() {
         className={styles.stage}
         data-view={view}
         data-project={currentProject.name}
-        data-transition={transition}
-        aria-busy={transition !== "idle"}
-        onAnimationEnd={(event) => {
-          if (event.target !== event.currentTarget) return;
-          if (transition === "out") {
-            setProject((current) => (current + direction.current + projects.length) % projects.length);
-            setView("all");
-            setTransition("in");
-          } else if (transition === "in") {
-            setTransition("idle");
-          }
-        }}
         role="region"
         aria-roledescription="карусель"
         aria-label="Слайдер проектов"
@@ -200,7 +185,7 @@ export default function Projects() {
       </div>
 
       <footer className={styles.footer}>
-        <div className={styles.projectInfo} data-transition={transition}>
+        <div className={styles.projectInfo}>
           <h3>
             {currentProject.name} <span>— {currentProject.category}</span>
           </h3>

@@ -212,7 +212,8 @@
   align-items: center;
   gap: 28px;
 }
-.serviceTop strong {
+.serviceTop strong,
+.steps strong {
   color: #607083;
   font-family: Impact, "Arial Narrow", sans-serif;
   font-size: 62px;
@@ -531,10 +532,6 @@
   grid-template-columns: auto 1fr;
   align-items: center;
   gap: 12px;
-}
-.steps strong {
-  font-size: 21px;
-  font-weight: 400;
 }
 .steps i {
   height: 1px;

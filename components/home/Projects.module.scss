@@ -397,39 +397,7 @@
   transition: background 0.2s, box-shadow 0.2s;
   &:hover { background: #e5ff86; }
 }
-.stage[data-transition="out"] {
-  animation: projectOut 220ms ease-in both;
-  pointer-events: none;
-}
-.stage[data-transition="in"] {
-  animation: projectIn 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  pointer-events: none;
-}
-.projectInfo[data-transition="out"] {
-  animation: projectInfoOut 220ms ease-in both;
-}
-.projectInfo[data-transition="in"] {
-  animation: projectInfoIn 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-@keyframes projectOut {
-  to { opacity: 0; transform: translateX(-24px) scale(0.98); }
-}
-@keyframes projectIn {
-  from { opacity: 0; transform: translateX(36px) scale(0.98); }
-  to { opacity: 1; transform: translateX(0) scale(1); }
-}
-@keyframes projectInfoOut {
-  to { opacity: 0; transform: translateY(-8px); }
-}
-@keyframes projectInfoIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
 @media (prefers-reduced-motion: reduce) {
-  .stage[data-transition], .projectInfo[data-transition] {
-    animation-duration: 1ms;
-    transform: none;
-  }
   .controls button.open { transition: none; }
 }
 .price {
