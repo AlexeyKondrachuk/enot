@@ -39,7 +39,7 @@ jobs:
           [[ "$SSH_USER" =~ ^[a-zA-Z0-9_-]+$ ]]
           [[ "$SSH_PORT" =~ ^[0-9]+$ ]]
           # Keep this workflow confined to the dedicated application directory.
-          [[ "$DEPLOY_PATH" == /home/it/enot ]]
+          [[ "$DEPLOY_PATH" == /home/nata/apps/enot ]]
           umask 077
           mkdir -p ~/.ssh
           printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/enot_actions

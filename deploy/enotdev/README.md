@@ -1,3 +1,17 @@
+# Новый сервер (ноябрь 2026)
+
+Используется существующий Nginx youremoteit-nginx-1 и сеть web-gateway.
+Конфигурация сайта устанавливается в /home/nata/apps/youremoteit/gateway/conf.d/enotdev.conf.
+Общий Nginx уже подготовлен; изменять его основной конфиг не требуется.
+SSH_USER=nata, SSH_HOST=2.26.10.240, SSH_PORT=22.
+Repository variables: DEPLOY_PATH=/home/nata/apps/enot,
+ENOTDEV_PROXY_NETWORK=web-gateway, VAPID_SUBJECT=mailto:dev@enotdev.su.
+Первый запуск выполняется вручную через Actions после обновления SSH-секретов.
+После деплоя включите HTTP скриптом nginx.sh, направьте DNS и выпустите сертификат.
+При настройке нового сервера существующие данные восстанавливаются только из резервной копии.
+
+Описания старого подключения общего Nginx ниже заменены инструкциями этого раздела.
+
 # Развёртывание enotdev.su
 
 Все команды выполняются из корня проекта enot. Это независимый Compose-проект
@@ -6,18 +20,18 @@ enotdev: Next.js / Node.js 24, чат Socket.IO, PostgreSQL 16 и миграци
 
 ## Подготовка сервера
 
-Разместите этот проект, например, в /home/it/enot. Нужны Docker Compose v2
+Разместите этот проект, например, в /home/nata/apps/enot. Нужны Docker Compose v2
 с поддержкой up --wait и работающий общий nginx из YouRemoteIT.
 В YouRemoteIT один раз примените изменение nginx/nginx.conf:
-include /var/www/certbot/nginx/enotdev/*.conf;
+include /etc/nginx/sites/*.conf;
 Пустой glob допустим. Если nginx.conf смонтирован отдельным файлом, копируйте
 его через rsync --inplace, чтобы работающий контейнер видел новый файл.
-После обновления проверьте docker exec nginx nginx -t.
+После обновления проверьте docker exec youremoteit-nginx-1 nginx -t.
 
 Узнайте имя существующей сети nginx:
 
 ```bash
-docker inspect nginx --format '{{range $name, $network := .NetworkSettings.Networks}}{{$name}}{{"\\n"}}{{end}}'
+docker inspect youremoteit-nginx-1 --format '{{range $name, $network := .NetworkSettings.Networks}}{{$name}}{{"\\n"}}{{end}}'
 ```
 
 В текущей конфигурации nginx использует одну сеть. Её фактическое имя укажите
@@ -63,7 +77,7 @@ YouRemoteIT postgres_data не используется. На хост новы�
 
 ```bash
 sudo bash deploy/enotdev/nginx.sh http
-sudo certbot certonly --webroot -w /var/www/certbot -d enotdev.su
+sudo certbot certonly --webroot -w /home/nata/apps/youremoteit/gateway/certbot -d enotdev.su
 sudo bash deploy/enotdev/nginx.sh https
 ```
 
@@ -77,7 +91,7 @@ sudo bash deploy/enotdev/nginx.sh https
 В существующем deploy-hook certbot должна быть команда:
 
 ```bash
-docker exec nginx nginx -t && docker exec nginx nginx -s reload
+docker exec youremoteit-nginx-1 nginx -t && docker exec youremoteit-nginx-1 nginx -s reload
 ```
 
 ## Обновления из папки enot
@@ -85,7 +99,7 @@ docker exec nginx nginx -t && docker exec nginx nginx -s reload
 Обновите код приложения на сервере и выполните:
 
 ```bash
-cd /home/it/enot
+cd /home/nata/apps/enot
 bash deploy/enotdev/deploy.sh
 ```
 
@@ -106,15 +120,15 @@ Repository secrets: SSH_HOST, SSH_USER, SSH_PORT, SSH_PRIVATE_KEY, SSH_KNOWN_HOS
 ENOTDEV_POSTGRES_PASSWORD, ENOTDEV_VAPID_PUBLIC_KEY, CHAT_ADMIN_PASSWORD,
 CHAT_SESSION_SECRET, VAPID_PRIVATE_KEY.
 
-Repository variables: DEPLOY_PATH=/home/it/enot,
-ENOTDEV_PROXY_NETWORK=app_app-network, VAPID_SUBJECT=mailto:dev@enotdev.su.
+Repository variables: DEPLOY_PATH=/home/nata/apps/enot,
+ENOTDEV_PROXY_NETWORK=web-gateway, VAPID_SUBJECT=mailto:dev@enotdev.su.
 Пароль PostgreSQL должен быть hex, остальные значения env — без пробелов,
 кавычек и символов интерполяции. Используйте сгенерированные hex-секреты и VAPID-пару.
 
 SSH_KNOWN_HOSTS получите через уже проверенное SSH-подключение на сервере:
 
 ```bash
-printf '45.67.59.159 '; cat /etc/ssh/ssh_host_ed25519_key.pub
+printf '2.26.10.240 '; cat /etc/ssh/ssh_host_ed25519_key.pub
 ```
 
 Workflow создаёт env-файлы и собирает Docker-образ на GitHub runner (linux/amd64).

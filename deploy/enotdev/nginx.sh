@@ -9,15 +9,15 @@ case "$mode" in
 esac
 
 # This directory is already mounted in the existing nginx container.
-destination=/var/www/certbot/nginx/enotdev
-site="$destination/site.conf"
-if ! docker exec nginx grep -Fq 'include /var/www/certbot/nginx/enotdev/*.conf;' /etc/nginx/nginx.conf; then
+destination=/home/nata/apps/youremoteit/gateway/conf.d
+site="$destination/enotdev.conf"
+if ! docker exec youremoteit-nginx-1 grep -Fq 'include /etc/nginx/sites/*.conf;' /etc/nginx/nginx.conf; then
     echo "The running nginx container must see the updated nginx.conf first (see README)." >&2
     exit 1
 fi
 if [[ "$mode" == https ]]; then
-    docker exec nginx test -s /etc/letsencrypt/live/enotdev.su/fullchain.pem
-    docker exec nginx test -s /etc/letsencrypt/live/enotdev.su/privkey.pem
+    docker exec youremoteit-nginx-1 test -s /etc/letsencrypt/live/enotdev.su/fullchain.pem
+    docker exec youremoteit-nginx-1 test -s /etc/letsencrypt/live/enotdev.su/privkey.pem
 fi
 
 mkdir -p "$destination"
@@ -42,7 +42,8 @@ cleanup() {
 trap cleanup EXIT
 # Only this site's config changes. Test before a graceful reload.
 cp "deploy/enotdev/nginx/enotdev.$mode.conf" "$site"
-docker exec nginx nginx -t
-docker exec nginx nginx -s reload
+chmod 644 "$site"
+docker exec youremoteit-nginx-1 nginx -t
+docker exec youremoteit-nginx-1 nginx -s reload
 committed=true
 echo "enotdev.su: $mode configuration applied."

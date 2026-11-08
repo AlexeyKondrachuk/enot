@@ -29,6 +29,6 @@ case "${1:-}" in
 esac
 compose up -d --wait enotdev-postgres
 # If migrations fail, existing web/chat containers remain running.
-compose run --rm --no-deps --pull never enotdev-migrate
+compose run --rm --no-deps -T --pull never enotdev-migrate </dev/null
 compose up -d --no-deps --no-build --pull never enotdev enotdev-chat
 compose ps
