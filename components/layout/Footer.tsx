@@ -46,7 +46,7 @@ export default function Footer() {
       </section>
       <a
         className={styles.hostingPartner}
-        href="https://beget.com/p1234567890/vip"
+        href="https://serv.host/?from=52933"
         target="_blank"
         rel="sponsored noopener noreferrer"
       >
@@ -58,7 +58,7 @@ export default function Footer() {
           </svg>
         </span>
         <span className={styles.hostingCopy}>
-          <span className={styles.hostingTitle}>Хостинг для вашего проекта <strong>Beget</strong></span>
+          <span className={styles.hostingTitle}>Хостинг для вашего проекта <strong>serv.host</strong></span>
           <span className={styles.hostingDisclosure}>Партнёрская ссылка</span>
         </span>
         <span className={styles.hostingArrow} aria-hidden="true">↗</span>
