@@ -1,5 +1,12 @@
 # Independent stack: use -p enotdev -f docker-compose.enotdev.yml.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 x-app: &app
+  logging: *logging
   image: enotdev-app:local
   env_file: [./deploy/enotdev/app.env]
   environment: &app-environment
@@ -12,6 +19,7 @@ x-app: &app
     NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${ENOTDEV_VAPID_PUBLIC_KEY:?Set the public VAPID key}
   depends_on:
     enotdev-postgres:
+    logging: *logging
       condition: service_healthy
 
 services:

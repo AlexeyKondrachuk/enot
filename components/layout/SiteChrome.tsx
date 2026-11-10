@@ -4,10 +4,11 @@ import { usePathname } from "next/navigation";
 import Footer from "./Footer";
 import Header from "./Header";
 import MobileNav from "./MobileNav";
+import CookieNotice from "./CookieNotice";
 
 export default function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin");
   if (isAdmin) return children;
-  return <><Header/>{children}<Footer/><MobileNav/></>;
+  return <><Header/>{children}<Footer/><MobileNav/><CookieNotice/></>;
 }
