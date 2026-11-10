@@ -1,13 +1,13 @@
 import { pageMetadata } from "@/lib/seo";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import Image from "next/image";
-import { Oswald } from "next/font/google";
+import localFont from "next/font/local";
 import ChatWidget from "@/components/home/ChatWidget";
 import DocumentActions from "@/components/documents/DocumentActions";
 import { siteConfig } from "@/config";
 import styles from "./page.module.scss";
 
-const heading = Oswald({ subsets: ["latin", "cyrillic"], weight: ["500", "600"], display: "swap", variable: "--documents-heading" });
+const heading = localFont({ src: "../fonts/Oswald.ttf", weight: "200 700", display: "swap", variable: "--documents-heading" });
 
 export const metadata = pageMetadata("Документы и условия работы", "Понятные документы для спокойной работы над проектом: договор, акт приёма-передачи и сопровождение.", "/documents");
 

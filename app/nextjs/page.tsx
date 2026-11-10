@@ -1,6 +1,6 @@
 import { pageMetadata } from "@/lib/seo";
 import Image from "next/image";
-import { Oswald } from "next/font/google";
+import localFont from "next/font/local";
 import ChatWidget from "@/components/home/ChatWidget";
 import NextjsHero from "@/components/nextjs/Hero";
 import Performance from "@/components/nextjs/Performance";
@@ -8,7 +8,7 @@ import { nextjsData as data } from "@/data/nextjs";
 import { siteConfig } from "@/config";
 import styles from "./page.module.scss";
 
-const headingFont = Oswald({ subsets: ["latin", "cyrillic"], weight: ["500", "600"], display: "swap", variable: "--nextjs-heading-font" });
+const headingFont = localFont({ src: "../fonts/Oswald.ttf", weight: "200 700", display: "swap", variable: "--nextjs-heading-font" });
 
 export const metadata = pageMetadata("Разработка на Next.js", "Сайты, интернет-магазины и веб-приложения на Next.js. Современная архитектура, производительность, SEO и интеграции под задачи вашего бизнеса.", "/nextjs");
 
