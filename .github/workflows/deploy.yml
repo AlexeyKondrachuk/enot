@@ -54,6 +54,8 @@ jobs:
             BatchMode yes
             StrictHostKeyChecking yes
             ConnectTimeout 20
+            ServerAliveInterval 30
+            ServerAliveCountMax 4
           EOF
           ssh enot-deploy "mkdir -p '$DEPLOY_PATH/deploy/enotdev' && chmod 700 '$DEPLOY_PATH'"
 
@@ -96,10 +98,31 @@ jobs:
             --build-arg NEXT_PUBLIC_VAPID_PUBLIC_KEY \
             -f deploy/enotdev/Dockerfile -t enotdev-app:local .
 
-      - name: Load image and deploy without building on server
+      - name: Compress Docker image
+        timeout-minutes: 10
         run: |
           set -euo pipefail
-          docker image save enotdev-app:local | ssh enot-deploy 'docker image load'
+          docker image inspect enotdev-app:local --format 'Image size (bytes): {{.Size}}'
+          docker image save enotdev-app:local | gzip -1 > "$RUNNER_TEMP/enotdev-app.tar.gz"
+          ls -lh "$RUNNER_TEMP/enotdev-app.tar.gz"
+
+      - name: Transfer compressed image with progress
+        timeout-minutes: 20
+        run: |
+          set -euo pipefail
+          rsync -h --info=progress2 --timeout=120 \
+            "$RUNNER_TEMP/enotdev-app.tar.gz" "enot-deploy:$DEPLOY_PATH/enotdev-app.tar.gz"
+
+      - name: Load image on server
+        timeout-minutes: 10
+        run: |
+          set -euo pipefail
+          ssh enot-deploy "set -e; docker image load -i '$DEPLOY_PATH/enotdev-app.tar.gz'; rm -f '$DEPLOY_PATH/enotdev-app.tar.gz'"
+
+      - name: Deploy without building on server
+        timeout-minutes: 10
+        run: |
+          set -euo pipefail
           ssh enot-deploy "cd '$DEPLOY_PATH' && chmod 600 .env.enotdev deploy/enotdev/app.env && bash deploy/enotdev/deploy.sh"
 
       - name: Remove runner secrets
