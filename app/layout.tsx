@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     template: `%s — ${siteConfig.name}`,
   },
   applicationName: siteConfig.name,
-  robots: { index: true, follow: true },
+  robots: { index: true, follow: true, "max-image-preview": "large" },
   icons: {
     icon: { url: "/favicon.svg", type: "image/svg+xml", sizes: "any" },
     apple: { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
