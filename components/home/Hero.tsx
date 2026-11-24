@@ -12,6 +12,10 @@ export default function Hero() {
         <a className={styles.primaryButton} href="#contact">Обсудить задачу <span aria-hidden="true">→</span></a>
         <a className={styles.secondaryButton} href="#projects">Смотреть проекты <span aria-hidden="true">→</span></a>
       </div>
+      <div className={styles.heroOffer}>
+        <h2>Макет главной страницы / экрана <strong>БЕСПЛАТНО</strong></h2>
+        <p>Расскажите о вашей задаче.</p>
+      </div>
     </div>
   </section>;
 }

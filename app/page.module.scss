@@ -59,6 +59,36 @@
 }
 .heroInner {
   padding-top: 147px;
+  padding-bottom: 28px;
+}
+.heroOffer {
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 20px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(31, 51, 65, 0.52);
+  backdrop-filter: blur(14px);
+  line-height: 1.5;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 650;
+    line-height: 1.15;
+  }
+
+  strong {
+    display: block;
+    margin-top: 4px;
+    color: $lime;
+    font-size: clamp(26px, 5vw, 48px);
+    font-weight: 800;
+  }
+
+  p {
+    margin: 8px 0 0;
+  }
 }
 .hero h1,
 .section h2,
